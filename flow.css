@@ -11,6 +11,30 @@ header .links a { color: #c7c7d9; font-size: 13px; text-decoration: none; border
   padding: 6px 12px; border-radius: 7px; }
 header .links a:hover { background: #20203f; }
 
+/* subbar = funnel strip + tag legend */
+.subbar { flex-shrink: 0; padding: 0 24px 12px; display: flex; flex-direction: column; gap: 7px; }
+.funnel { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11.5px; color: #c7c7d9;
+  font-family: "JetBrains Mono", monospace; }
+.funnel .f-cap { color: #8888a8; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; }
+.funnel .f-step { background: #1c1c33; border: 1px solid #2e2e4d; border-radius: 5px; padding: 2px 8px; }
+.funnel .f-step em { color: #ffb454; font-style: normal; margin-left: 4px; }
+.funnel .f-arr { color: #555; }
+.legend { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; }
+.legend .lg-cap { color: #8888a8; font-size: 10px; text-transform: uppercase; letter-spacing: .5px; margin-right: 2px; }
+.legend .lg-item { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: #9a9ab5; }
+
+/* tag chip (출처) */
+.tchip { font-family: "JetBrains Mono", monospace; font-size: 9px; font-weight: 600; padding: 1px 4px;
+  border-radius: 3px; border: 1px solid; line-height: 1.4; white-space: nowrap; }
+.t-6            { color: #cdeac0; border-color: #3a5a2e; background: #1a2814; }
+.t-export      { color: #ffd27a; border-color: #5a4520; background: #2a2010; }
+.t-derive      { color: #9ad7ff; border-color: #26465a; background: #10202a; }
+.t-classify    { color: #d3a4ff; border-color: #43285a; background: #1d1030; }
+.t-notcollected{ color: #ff8a8a; border-color: #5a2626; background: #2a1010; }
+.t-customer    { color: #c7c7d9; border-color: #3a3a55; background: #1d1d33; }
+.t-ai          { color: #ff7ac0; border-color: #5a2645; background: #2a1020; }
+.t-future      { color: #8888a8; border-color: #33334d; background: #16162b; }
+
 /* body = canvas + right sidebar */
 .body { flex: 1; display: flex; min-height: 0; }
 
@@ -26,7 +50,11 @@ header .links a:hover { background: #20203f; }
 .node .nlabel { font-family: "JetBrains Mono", ui-monospace, monospace; color: #eaeaff; font-size: 12.5px;
   font-weight: 500; letter-spacing: -.2px; word-break: break-all; }
 .node .nsub { color: #9a9ab5; font-size: 11px; margin-top: 2px; }
+.node .nbadge { display: inline-block; margin-top: 5px; font-size: 9.5px; line-height: 1.4;
+  color: #ffd27a; border: 1px solid #5a4520; background: #241c10; border-radius: 4px; padding: 1px 5px; }
 .node.sel { border-color: #ff5a5f; box-shadow: 0 0 0 1px #ff5a5f; }
+.node.tentative { border-style: dashed; }
+.node.tentative .nbadge { color: #c7c7d9; border-color: #3a3a55; background: #1d1d33; }
 
 .lane[data-stage="1"] .node { border-left: 3px solid #4ecca3; }
 .lane[data-stage="2"] .node { border-left: 3px solid #ffb454; }
@@ -41,6 +69,8 @@ svg.edges path.writeback { stroke-dasharray: 4 3; stroke: #555; }
 .canvas.focus .node.hl { opacity: 1; }
 .canvas.focus svg.edges path { opacity: .05; }
 svg.edges path.hl { stroke: #ff5a5f; stroke-width: 2.4; opacity: 1 !important; }
+svg.edges text.elabel { fill: #8888a8; font-size: 10px; font-family: "JetBrains Mono", monospace; }
+.canvas.focus svg.edges text.elabel { opacity: .15; }
 
 /* right sidebar */
 .side { width: 380px; flex-shrink: 0; background: #16162b; border-left: 1px solid #2e2e4d;
@@ -49,6 +79,9 @@ svg.edges path.hl { stroke: #ff5a5f; stroke-width: 2.4; opacity: 1 !important; }
 .s-label { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 16px; font-weight: 500; color: #fff; word-break: break-all; }
 .s-stage { font-size: 11px; color: #8888a8; white-space: nowrap; }
 .s-sub { color: #c7c7d9; font-size: 12px; margin-top: 4px; }
+.s-badge { display: inline-block; margin-top: 8px; font-size: 11px; color: #ffd27a;
+  border: 1px solid #5a4520; background: #241c10; border-radius: 5px; padding: 2px 8px; }
+.s-badge.tentative { color: #c7c7d9; border-color: #3a3a55; background: #1d1d33; }
 .s-desc { font-size: 13px; color: #b3b3cc; line-height: 1.6; margin: 12px 0 4px; }
 .s-section { font-size: 11px; font-weight: 700; color: #8888a8; text-transform: uppercase;
   letter-spacing: .5px; margin: 18px 0 8px; }

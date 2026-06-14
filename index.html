@@ -16,6 +16,19 @@
     <div class="sub">수집 데이터가 어떤 테이블에 저장되고, 어떤 지표로 가공되어, 어느 화면에 보여지는지. 노드에 마우스를 올리면 경로 강조 · 클릭하면 우측에 예시 스키마.</div>
   </header>
 
+  <div class="subbar">
+    <div class="funnel">
+      <span class="f-cap">지표 funnel</span>
+      <span class="f-step">Match</span><span class="f-arr">→</span>
+      <span class="f-step">Alert <em>모니터링</em></span><span class="f-arr">→</span>
+      <span class="f-step">Infringement <em>위조품</em></span><span class="f-arr">→</span>
+      <span class="f-step">Enforcement <em>차단완료</em></span><span class="f-arr">/</span>
+      <span class="f-step">Non-enforceable <em>차단불가</em></span><span class="f-arr">↺</span>
+      <span class="f-step">Reactivated <em>재활성화</em></span>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
   <div class="body">
     <div class="canvas" id="canvas"></div>
     <aside class="side" id="side"></aside>

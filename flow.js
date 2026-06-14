@@ -7,6 +7,27 @@ let svg;
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
+// tag → [짧은 코드, 설명]  (출처/갭)
+const TAG_META = {
+  "6":            ["6",   "제공(6필드)"],
+  "export":       ["EXP", "Red Points 내보내기 · 채널 미정"],
+  "derive":       ["DRV", "계산/파생"],
+  "classify":     ["CLS", "분류 필요(brain)"],
+  "not-collected":["N/C", "미수집"],
+  "customer":     ["CUS", "고객 관리"],
+  "ai":           ["AI",  "RP 내부지표 · 재현 난망"],
+  "future":       ["FUT", "목표(범위 외)"],
+};
+const tagClass = t => "t-" + t.replace(/[^a-z0-9]/g, "");
+
+function buildLegend() {
+  const el = document.getElementById("legend");
+  if (!el) return;
+  el.innerHTML = `<span class="lg-cap">출처</span>` + Object.entries(TAG_META)
+    .map(([k, [code, label]]) => `<span class="lg-item"><span class="tchip ${tagClass(k)}">${code}</span>${esc(label)}</span>`)
+    .join("");
+}
+
 function buildLanes() {
   for (let s = 1; s <= 4; s++) {
     const lane = document.createElement("div");
@@ -14,8 +35,10 @@ function buildLanes() {
     lane.innerHTML = `<div class="lane-title">${STAGE_LABELS[s]}</div>`;
     FLOW_NODES.filter(n => n.stage === s).forEach(n => {
       const el = document.createElement("div");
-      el.className = "node"; el.id = "n-" + n.id; el.dataset.id = n.id;
-      el.innerHTML = `<div class="nlabel">${n.label}</div>` + (n.sub ? `<div class="nsub">${n.sub}</div>` : "");
+      el.className = "node" + (n.tentative ? " tentative" : ""); el.id = "n-" + n.id; el.dataset.id = n.id;
+      el.innerHTML = `<div class="nlabel">${n.label}</div>`
+        + (n.sub ? `<div class="nsub">${n.sub}</div>` : "")
+        + (n.badge ? `<div class="nbadge">${esc(n.badge)}</div>` : "");
       el.onmouseenter = () => focusNode(n.id);
       el.onmouseleave = clearFocus;
       el.onclick = () => selectNode(n.id);
@@ -47,6 +70,13 @@ function drawEdges() {
     p.setAttribute("id", edgeId(e));
     if (e[2] === "writeback") p.classList.add("writeback");
     svg.appendChild(p);
+    if (e[3]) {                                                // labeled edge
+      const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      t.setAttribute("x", (x1 + x2) / 2); t.setAttribute("y", (y1 + y2) / 2 - 4);
+      t.setAttribute("text-anchor", "middle"); t.setAttribute("class", "elabel");
+      t.textContent = e[3];
+      svg.appendChild(t);
+    }
   });
 }
 
@@ -79,8 +109,12 @@ function clearFocus() {                                       // hover out: fall
 }
 
 function schemaTable(rows) {
-  return `<table class="schema"><thead><tr><th>필드</th><th>타입</th><th>예시</th></tr></thead><tbody>` +
-    rows.map(([f, t, ex]) => `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td></tr>`).join("") +
+  return `<table class="schema"><thead><tr><th>필드</th><th>타입</th><th>예시</th><th>출처</th></tr></thead><tbody>` +
+    rows.map(([f, t, ex, tag]) => {
+      const meta = TAG_META[tag];
+      const chip = meta ? `<span class="tchip ${tagClass(tag)}" title="${esc(meta[1])}">${meta[0]}</span>` : "";
+      return `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td><td class="tag">${chip}</td></tr>`;
+    }).join("") +
     `</tbody></table>`;
 }
 
@@ -96,6 +130,7 @@ function selectNode(id) {
   side.innerHTML = `
     <div class="s-head"><span class="s-label">${n.label}</span><span class="s-stage">${STAGE_LABELS[n.stage]}</span></div>
     ${n.sub ? `<div class="s-sub">${n.sub}</div>` : ""}
+    ${n.badge ? `<div class="s-badge${n.tentative ? " tentative" : ""}">${esc(n.badge)}</div>` : ""}
     <div class="s-desc">${n.desc}</div>
     ${n.schema ? `<div class="s-section">예시 스키마</div>${schemaTable(n.schema)}` : ""}
     <div class="s-section">흐름</div>
@@ -103,6 +138,7 @@ function selectNode(id) {
     <div class="s-flow"><b>▶ 보내는 곳</b><br>${chips(outs)}</div>`;
 }
 
+buildLegend();
 buildLanes();
 requestAnimationFrame(() => { drawEdges(); selectNode("raw_listing"); });
 window.addEventListener("resize", drawEdges);
