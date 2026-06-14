@@ -60,4 +60,3 @@ const STATUS_LABEL = {
   pending: "확정 대기", enforced: "차단완료",
   non_enforceable: "차단불가", discarded: "삭제", on_hold: "보류",
 };
-</content>

@@ -86,4 +86,3 @@ buildLanes();
 requestAnimationFrame(() => { drawEdges(); selectNode("incident"); });
 window.addEventListener("resize", drawEdges);
 canvas.addEventListener("scroll", drawEdges);
-</content>

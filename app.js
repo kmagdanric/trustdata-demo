@@ -80,4 +80,3 @@ function show(name) {
 }
 
 show("home");
-</content>

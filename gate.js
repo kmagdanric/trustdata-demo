@@ -38,4 +38,3 @@ function buildGate() {
   document.getElementById("gate-pw").onkeydown = e => { if (e.key === "Enter") submit(); };
 }
 buildGate();
-</content>

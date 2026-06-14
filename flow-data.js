@@ -79,4 +79,3 @@ const STAGE_LABELS = {
   1: "① 수집 · 연동", 2: "② 표준 저장 (Source of Truth)",
   3: "③ 지표 산출 (Views)", 4: "④ 대시보드 화면",
 };
-</content>
