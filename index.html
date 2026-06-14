@@ -4,17 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TrustData — 데이터 흐름</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="flow.css">
 </head>
 <body>
   <header>
     <div class="links"><a href="dashboard.html">대시보드 화면 미리보기 →</a></div>
     <div class="title">TRUST<span>data</span> · 브랜드 보호 대시보드 — 데이터 흐름</div>
-    <div class="sub">수집 데이터가 어떤 테이블에 저장되고, 어떤 지표로 가공되어, 어느 화면에 보여지는지. (노드에 마우스를 올리면 경로 강조 · 클릭하면 상세)</div>
+    <div class="sub">수집 데이터가 어떤 테이블에 저장되고, 어떤 지표로 가공되어, 어느 화면에 보여지는지. 노드에 마우스를 올리면 경로 강조 · 클릭하면 우측에 예시 스키마.</div>
   </header>
 
-  <div class="canvas" id="canvas"></div>
-  <div class="detail" id="detail"></div>
+  <div class="body">
+    <div class="canvas" id="canvas"></div>
+    <aside class="side" id="side"></aside>
+  </div>
 
   <script src="gate.js"></script>
   <script src="flow-data.js"></script>

@@ -2,8 +2,10 @@
 
 const byId = Object.fromEntries(FLOW_NODES.map(n => [n.id, n]));
 const canvas = document.getElementById("canvas");
-const detail = document.getElementById("detail");
+const side = document.getElementById("side");
 let svg;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function buildLanes() {
   for (let s = 1; s <= 4; s++) {
@@ -50,9 +52,7 @@ function drawEdges() {
 
 function neighbors(id) {
   const nodes = new Set([id]), edges = [];
-  FLOW_EDGES.forEach(e => {
-    if (e[0] === id || e[1] === id) { nodes.add(e[0]); nodes.add(e[1]); edges.push(e); }
-  });
+  FLOW_EDGES.forEach(e => { if (e[0] === id || e[1] === id) { nodes.add(e[0]); nodes.add(e[1]); edges.push(e); } });
   return { nodes, edges };
 }
 
@@ -69,20 +69,30 @@ function clearFocus() {
   svg.querySelectorAll("path.hl").forEach(p => p.classList.remove("hl"));
 }
 
+function schemaTable(rows) {
+  return `<table class="schema"><thead><tr><th>필드</th><th>타입</th><th>예시</th></tr></thead><tbody>` +
+    rows.map(([f, t, ex]) => `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td></tr>`).join("") +
+    `</tbody></table>`;
+}
+
 function selectNode(id) {
   canvas.querySelectorAll(".node.sel").forEach(n => n.classList.remove("sel"));
   document.getElementById("n-" + id)?.classList.add("sel");
   const n = byId[id];
   const ins = FLOW_EDGES.filter(e => e[1] === id).map(e => e[0]);
   const outs = FLOW_EDGES.filter(e => e[0] === id).map(e => e[1]);
-  const chips = ids => ids.length ? ids.map(i => `<span class="chip">${byId[i]?.label || i}</span>`).join("") : "<span class='dflow'>—</span>";
-  detail.innerHTML = `
-    <div class="dhead">${n.label}<span class="dstage">${STAGE_LABELS[n.stage]}${n.sub ? " · " + n.sub : ""}</span></div>
-    <div class="ddesc">${n.desc}</div>
-    <div class="dflow"><b>받는 데이터 ◀</b> ${chips(ins)} &nbsp;&nbsp; <b>▶ 보내는 곳</b> ${chips(outs)}</div>`;
+  const chips = ids => ids.length ? ids.map(i => `<span class="chip" onclick="selectNode('${i}')">${byId[i]?.label || i}</span>`).join("") : "—";
+  side.innerHTML = `
+    <div class="s-head"><span class="s-label">${n.label}</span><span class="s-stage">${STAGE_LABELS[n.stage]}</span></div>
+    ${n.sub ? `<div class="s-sub">${n.sub}</div>` : ""}
+    <div class="s-desc">${n.desc}</div>
+    ${n.schema ? `<div class="s-section">예시 스키마</div>${schemaTable(n.schema)}` : ""}
+    <div class="s-section">흐름</div>
+    <div class="s-flow"><b>◀ 받는 데이터</b><br>${chips(ins)}</div>
+    <div class="s-flow"><b>▶ 보내는 곳</b><br>${chips(outs)}</div>`;
 }
 
 buildLanes();
-requestAnimationFrame(() => { drawEdges(); selectNode("incident"); });
+requestAnimationFrame(() => { drawEdges(); selectNode("raw_listing"); });
 window.addEventListener("resize", drawEdges);
 canvas.addEventListener("scroll", drawEdges);
