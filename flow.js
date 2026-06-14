@@ -56,17 +56,26 @@ function neighbors(id) {
   return { nodes, edges };
 }
 
-function focusNode(id) {
+let selectedId = null;
+
+function setHL(id) {
   const { nodes, edges } = neighbors(id);
   canvas.classList.add("focus");
   nodes.forEach(nid => document.getElementById("n-" + nid)?.classList.add("hl"));
   edges.forEach(e => document.getElementById(edgeId(e))?.classList.add("hl"));
 }
 
-function clearFocus() {
-  canvas.classList.remove("focus");
+function clearHL() {
   canvas.querySelectorAll(".node.hl").forEach(n => n.classList.remove("hl"));
   svg.querySelectorAll("path.hl").forEach(p => p.classList.remove("hl"));
+}
+
+function focusNode(id) { clearHL(); setHL(id); }              // hover: temporary
+
+function clearFocus() {                                       // hover out: fall back to selection
+  clearHL();
+  if (selectedId) setHL(selectedId);
+  else canvas.classList.remove("focus");
 }
 
 function schemaTable(rows) {
@@ -78,6 +87,8 @@ function schemaTable(rows) {
 function selectNode(id) {
   canvas.querySelectorAll(".node.sel").forEach(n => n.classList.remove("sel"));
   document.getElementById("n-" + id)?.classList.add("sel");
+  selectedId = id;
+  clearHL(); setHL(id);                                      // persistent highlight on select
   const n = byId[id];
   const ins = FLOW_EDGES.filter(e => e[1] === id).map(e => e[0]);
   const outs = FLOW_EDGES.filter(e => e[0] === id).map(e => e[1]);
