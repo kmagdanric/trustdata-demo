@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrustData — Dashboard UI mock</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>.backlink{position:fixed;right:16px;top:12px;z-index:5;font-size:12px;color:#6c5ce7;text-decoration:none}</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">TRUST<span>data</span></div>
+    <div class="nav-group">Workspace</div>
+    <div class="nav-item active" data-view="home" onclick="show('home')">Home</div>
+    <div class="nav-item" data-view="validation" onclick="show('validation')">Validation</div>
+    <div class="nav-item" data-view="database" onclick="show('database')">Database</div>
+    <div class="nav-group">Data &amp; Insights</div>
+    <div class="nav-item" data-view="summary" onclick="show('summary')">Summary</div>
+    <div class="nav-item" data-view="analysis" onclick="show('analysis')">Result analysis</div>
+    <div class="nav-item" data-view="nonenf" onclick="show('nonenf')">Non-enforceable</div>
+    <div class="nav-item" data-view="sellers" onclick="show('sellers')">Sellers</div>
+    <div class="nav-item" data-view="economic" onclick="show('economic')">Economic impact</div>
+    <div class="nav-group">Configuration</div>
+    <div class="nav-item" data-view="sellerlists" onclick="show('sellerlists')">Seller lists</div>
+    <div class="nav-item" data-view="documents" onclick="show('documents')">Documents</div>
+  </aside>
+
+  <main class="main">
+    <a class="backlink" href="index.html">← 데이터 흐름</a>
+    <h1 id="title">Dashboard</h1>
+    <div id="view-home" class="view"></div>
+    <div id="view-validation" class="view"></div>
+    <div id="view-database" class="view"></div>
+    <div id="view-summary" class="view"></div>
+    <div id="view-analysis" class="view"></div>
+    <div id="view-nonenf" class="view"></div>
+    <div id="view-sellers" class="view"></div>
+    <div id="view-economic" class="view"></div>
+    <div id="view-sellerlists" class="view"></div>
+    <div id="view-documents" class="view"></div>
+  </main>
+
+  <script src="gate.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+</content>
