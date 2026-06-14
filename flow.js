@@ -7,26 +7,17 @@ let svg;
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// tag → [짧은 코드, 설명]  (출처/갭)
+// tag → [표시 텍스트, 설명]  (출처/갭)
 const TAG_META = {
-  "6":            ["6",   "제공(6필드)"],
-  "export":       ["EXP", "Red Points 내보내기 · 채널 미정"],
-  "derive":       ["DRV", "계산/파생"],
-  "classify":     ["CLS", "분류 필요(brain)"],
-  "not-collected":["N/C", "미수집"],
-  "customer":     ["CUS", "고객 관리"],
-  "ai":           ["AI",  "RP 내부지표 · 재현 난망"],
-  "future":       ["FUT", "목표(범위 외)"],
+  "6":            ["제공",      "제공(6필드)"],
+  "export":       ["RP export", "Red Points 내보내기 · 채널 미정"],
+  "derive":       ["파생",      "계산/파생"],
+  "classify":     ["분류",      "분류 필요(brain)"],
+  "not-collected":["미수집",    "현재 미수집"],
+  "customer":     ["고객",      "고객 관리"],
+  "ai":           ["RP내부",    "RP 내부지표 · 재현 난망"],
+  "future":       ["목표",      "목표(범위 외)"],
 };
-const tagClass = t => "t-" + t.replace(/[^a-z0-9]/g, "");
-
-function buildLegend() {
-  const el = document.getElementById("legend");
-  if (!el) return;
-  el.innerHTML = `<span class="lg-cap">출처</span>` + Object.entries(TAG_META)
-    .map(([k, [code, label]]) => `<span class="lg-item"><span class="tchip ${tagClass(k)}">${code}</span>${esc(label)}</span>`)
-    .join("");
-}
 
 function buildLanes() {
   for (let s = 1; s <= 4; s++) {
@@ -112,8 +103,8 @@ function schemaTable(rows) {
   return `<table class="schema"><thead><tr><th>필드</th><th>타입</th><th>예시</th><th>출처</th></tr></thead><tbody>` +
     rows.map(([f, t, ex, tag]) => {
       const meta = TAG_META[tag];
-      const chip = meta ? `<span class="tchip ${tagClass(tag)}" title="${esc(meta[1])}">${meta[0]}</span>` : "";
-      return `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td><td class="tag">${chip}</td></tr>`;
+      const txt = meta ? `<span title="${esc(meta[1])}">${esc(meta[0])}</span>` : "";
+      return `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td><td class="tag">${txt}</td></tr>`;
     }).join("") +
     `</tbody></table>`;
 }
@@ -138,7 +129,6 @@ function selectNode(id) {
     <div class="s-flow"><b>▶ 보내는 곳</b><br>${chips(outs)}</div>`;
 }
 
-buildLegend();
 buildLanes();
 requestAnimationFrame(() => { drawEdges(); selectNode("raw_listing"); });
 window.addEventListener("resize", drawEdges);
