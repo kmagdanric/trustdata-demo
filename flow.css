@@ -26,10 +26,8 @@ header .links a:hover { background: #20203f; }
 .node .nlabel { font-family: "JetBrains Mono", ui-monospace, monospace; color: #eaeaff; font-size: 12.5px;
   font-weight: 500; letter-spacing: -.2px; word-break: break-all; }
 .node .nsub { color: #9a9ab5; font-size: 11px; margin-top: 2px; }
-.node .nbadge { display: block; margin-top: 4px; font-size: 9.5px; line-height: 1.4; color: #9a8a6a; }
 .node.sel { border-color: #ff5a5f; box-shadow: 0 0 0 1px #ff5a5f; }
 .node.tentative { border-style: dashed; }
-.node.tentative .nbadge { color: #8888a8; }
 
 .lane[data-stage="1"] .node { border-left: 3px solid #4ecca3; }
 .lane[data-stage="2"] .node { border-left: 3px solid #ffb454; }
@@ -54,9 +52,6 @@ svg.edges text.elabel { fill: #8888a8; font-size: 10px; font-family: "JetBrains 
 .s-label { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 16px; font-weight: 500; color: #fff; word-break: break-all; }
 .s-stage { font-size: 11px; color: #8888a8; white-space: nowrap; }
 .s-sub { color: #c7c7d9; font-size: 12px; margin-top: 4px; }
-.s-badge { display: inline-block; margin-top: 8px; font-size: 11px; color: #ffd27a;
-  border: 1px solid #5a4520; background: #241c10; border-radius: 5px; padding: 2px 8px; }
-.s-badge.tentative { color: #c7c7d9; border-color: #3a3a55; background: #1d1d33; }
 .s-desc { font-size: 13px; color: #b3b3cc; line-height: 1.6; margin: 12px 0 4px; }
 .s-section { font-size: 11px; font-weight: 700; color: #8888a8; text-transform: uppercase;
   letter-spacing: .5px; margin: 18px 0 8px; }

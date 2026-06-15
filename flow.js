@@ -28,8 +28,7 @@ function buildLanes() {
       const el = document.createElement("div");
       el.className = "node" + (n.tentative ? " tentative" : ""); el.id = "n-" + n.id; el.dataset.id = n.id;
       el.innerHTML = `<div class="nlabel">${n.label}</div>`
-        + (n.sub ? `<div class="nsub">${n.sub}</div>` : "")
-        + (n.badge ? `<div class="nbadge">${esc(n.badge)}</div>` : "");
+        + (n.sub ? `<div class="nsub">${n.sub}</div>` : "");
       el.onmouseenter = () => focusNode(n.id);
       el.onmouseleave = clearFocus;
       el.onclick = () => selectNode(n.id);
@@ -121,7 +120,6 @@ function selectNode(id) {
   side.innerHTML = `
     <div class="s-head"><span class="s-label">${n.label}</span><span class="s-stage">${STAGE_LABELS[n.stage]}</span></div>
     ${n.sub ? `<div class="s-sub">${n.sub}</div>` : ""}
-    ${n.badge ? `<div class="s-badge${n.tentative ? " tentative" : ""}">${esc(n.badge)}</div>` : ""}
     <div class="s-desc">${n.desc}</div>
     ${n.schema ? `<div class="s-section">예시 스키마</div>${schemaTable(n.schema)}` : ""}
     <div class="s-section">흐름</div>

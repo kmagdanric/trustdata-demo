@@ -1,11 +1,11 @@
 // Data-flow graph. 4 stages, nodes + edges + example schema. Refine freely.
 // stage: 1 수집·연동 / 2 표준 저장(SoT) / 3 지표 산출(뷰) / 4 대시보드 화면
 // schema rows: [field, type, example, tag]  ← tag = 출처/갭 (see TAG_META in flow.js)
-// node.badge: 작은 출처/주의 라벨 · node.tentative: 파생/목표(점선)
+// node.tentative: 파생/목표(점선)
 
 const FLOW_NODES = [
   // 1 — Ingest
-  { id: "raw_listing", stage: 1, label: "raw_listing", sub: "리스팅 원천", badge: "Red Points 수집 · 채널 미정",
+  { id: "raw_listing", stage: 1, label: "raw_listing", sub: "리스팅 원천",
     desc: "고객이 제공하는 원천 데이터. 글로벌 마켓플레이스(타오바오·티몰·1688·알리·쇼피·라자다 등)에서 수집한 '의심 상품 1건'이 한 행입니다. 오늘은 Red Points 모니터링에서 나오며, 위조 여부·차단 결과 같은 운영 값은 아직 없습니다.",
     schema: [
       ["listing_id", "string", "TB-8843112905", "export"],
@@ -21,7 +21,7 @@ const FLOW_NODES = [
       ["country", "string", "CN", "derive"],
       ["collected_at", "datetime", "2025-08-02T10:04:00Z", "export"],
     ] },
-  { id: "raw_enforcement", stage: 1, label: "raw_enforcement", sub: "단속 결과", badge: "Red Points 단속 · 채널 미정 · 필수",
+  { id: "raw_enforcement", stage: 1, label: "raw_enforcement", sub: "단속 결과",
     desc: "위조품 상태·차단 결과 등 운영 과정에서 생기는 값. 수집 피드에는 없으므로 Red Points 내보내기/연동으로 별도 확보해야 합니다. 이 테이블 전체가 화면 오른쪽 절반을 구동하며 100% Red Points 의존입니다 — 채널이 'UI 전용'이면 5개 화면이 막힙니다.",
     schema: [
       ["listing_id", "string", "TB-8843112905", "export"],
@@ -33,7 +33,7 @@ const FLOW_NODES = [
       ["non_enforceable_reason", "enum|null", "null", "export"],
       ["enforcement_outcome", "enum", "enforced", "export"],
     ] },
-  { id: "raw_seller", stage: 1, label: "raw_seller", sub: "셀러 프로필(선택)", badge: "RP Seller Intel · 선택",
+  { id: "raw_seller", stage: 1, label: "raw_seller", sub: "셀러 프로필(선택)",
     desc: "제공 시 셀러 식별·중복 판별 보강에 사용. 연락처류는 PDF상 대부분 비어 있음(⊘).",
     schema: [
       ["seller_name", "string", "inststudio设计师", "6"],
@@ -66,7 +66,7 @@ const FLOW_NODES = [
       ["link_flag", "enum|null", "reactivated", "export"],
       ["non_enforceable_reason", "enum|null", "null", "export"],
     ] },
-  { id: "enforcement_event", stage: 2, label: "enforcement_event", sub: "상태 이벤트 로그", tentative: true, badge: "파생 · 일부 목표",
+  { id: "enforcement_event", stage: 2, label: "enforcement_event", sub: "상태 이벤트 로그", tentative: true,
     desc: "추가 전용(append-only) 이벤트: 모니터링→위조품 확정→차단완료/차단불가→재활성화. 오늘은 export의 status+몇 개 날짜로 '재구성'한 것 — actor 단위의 진짜 이벤트 스트림(특히 재활성화 이력)은 목표(future)입니다.",
     schema: [
       ["event_id", "bigint", "99021", "derive"],
@@ -76,7 +76,7 @@ const FLOW_NODES = [
       ["occurred_at", "datetime", "2025-08-25T09:13:00Z", "export"],
       ["note", "string|null", "null", "future"],
     ] },
-  { id: "seller", stage: 2, label: "seller", sub: "셀러", badge: "해상도 = name+platform",
+  { id: "seller", stage: 2, label: "seller", sub: "셀러",
     desc: "셀러 식별 단위. Red Points는 교차계정 식별해소를 안 함('프로필 다르면 각각 1 seller') → 오늘은 사실상 name+platform. 진짜 식별해소(ER)는 목표(future).",
     schema: [
       ["id", "string", "slr_00913", "export"],
@@ -97,7 +97,7 @@ const FLOW_NODES = [
       ["platform.name", "string", "Taobao", "6"],
       ["platform.country", "string", "CN", "derive"],
     ] },
-  { id: "lists", stage: 2, label: "allow / deny / watch", sub: "셀러 리스트", badge: "고객 관리",
+  { id: "lists", stage: 2, label: "allow / deny / watch", sub: "셀러 리스트",
     desc: "화이트리스트(공식 셀러는 신고 제외·표시)·차단·관찰 목록.",
     schema: [
       ["list_type", "enum", "allow", "customer"],
@@ -106,7 +106,7 @@ const FLOW_NODES = [
       ["added_by", "string", "customer", "customer"],
       ["added_at", "date", "2025-07-01", "customer"],
     ] },
-  { id: "document", stage: 2, label: "document", sub: "국가별 IP 문서", badge: "고객 관리",
+  { id: "document", stage: 2, label: "document", sub: "국가별 IP 문서",
     desc: "브랜드 IP 등록증·수권서. 국가별 권리 → 단속 가능 여부 판단 근거.",
     schema: [
       ["id", "string", "doc_kr_001", "customer"],
