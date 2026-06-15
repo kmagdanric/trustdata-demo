@@ -7,15 +7,16 @@ let svg;
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// tag → [표시 텍스트, 설명]  (출처/갭)
+// tag → [표시 텍스트, 설명]  (출처)
 const TAG_META = {
-  "6":            ["제공",      "제공(6필드)"],
-  "export":       ["RP export", "Red Points 내보내기 · 채널 미정"],
+  "6":            ["제공",      "TrustData가 수집하는 6필드"],
+  "acquire":      ["구매/크롤", "리스팅 데이터 — 벤더 구매(권장) 또는 크롤"],
+  "firstparty":   ["자체운영",  "TrustData가 대시보드 안에서 직접 생성(검증·단속)"],
   "derive":       ["파생",      "계산/파생"],
   "classify":     ["분류",      "분류 필요(brain)"],
-  "not-collected":["미수집",    "현재 미수집"],
-  "customer":     ["고객",      "고객 관리"],
-  "ai":           ["RP내부",    "RP 내부지표 · 재현 난망"],
+  "not-collected":["미수집",    "수집 파이프 필요 · stock은 어디서도 신뢰 불가"],
+  "customer":     ["고객관리",  "TrustData가 업로드·유지"],
+  "ref-only":     ["참조전용",  "Red Points 참조 디자인 지표 · 재현 불가"],
   "future":       ["목표",      "목표(범위 외)"],
 };
 
