@@ -1,124 +1,102 @@
-// 구축해야 할 데이터셋 — 렌더러. Vanilla JS.
-// 필터: 파이프라인 단계 / 판별 질문 / 출처 유형. 하나 누르면 해당 데이터셋만 강조.
+// 구축해야 할 데이터셋 — 렌더러. Vanilla JS. data flow 페이지와 같은 노드+레인+사이드패널 모델.
 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const ALL = [...REF_DATASETS, ...OP_DATASETS];
+const canvas = document.getElementById("canvas");
+const side = document.getElementById("side");
+const toolbar = document.getElementById("toolbar");
+
 const stageLabel = id => (PIPELINE.find(p => p.id === id) || {}).label || id;
+const laneLabel  = id => (LANES.find(l => l.id === id) || {}).title || id;
 
-let filter = null; // { kind: 'stage'|'question'|'src', val: string }
+let selectedId = null;
+let focusOn = null; // { kind: 'stage'|'question', val }
 
-function worldsHTML() {
-  const s = SUSPECT_DATA;
-  return `
-  <div class="worlds">
-    <div class="world suspect">
-      <h3>판별 대상 — 의심 리스팅</h3>
-      <div class="tag">${esc(s.mono)}</div>
-      <p>${esc(s.what)}</p>
-      <div class="how">획득: ${esc(s.how)}</div>
-      <div class="verdict">크롤 / 구매로 얻는 건 오직 이것 — "문제지"</div>
-    </div>
-    <div class="vs">대조 ▶</div>
-    <div class="world answer">
-      <h3>판별 기준 — 정답지 (아래 데이터셋)</h3>
-      <div class="tag">reference + first-party</div>
-      <p>가격·이미지·셀러·상표 기준. 의심 리스팅을 이 기준과 대조해야 판별이 된다.</p>
-      <div class="how">획득: 브랜드 · 공개 등록부 · 자체 운영. 마켓에 없다.</div>
-      <div class="verdict">크롤로 못 얻는다 — 그래서 해자(moat)</div>
-    </div>
-  </div>`;
+function buildLanes() {
+  LANES.forEach(lane => {
+    const el = document.createElement("div");
+    el.className = "lane"; el.dataset.src = lane.id;
+    el.innerHTML = `<div class="lane-title"><div class="lt">${esc(lane.title)}</div><div class="ls">${esc(lane.sub)}</div></div>`;
+    NODES.filter(n => n.srcType === lane.id).forEach(n => {
+      const node = document.createElement("div");
+      node.className = "node"; node.id = "n-" + n.id; node.dataset.id = n.id;
+      node.innerHTML = `<div class="nlabel">${esc(n.mono)}</div>`
+        + `<div class="nname">${esc(n.name)}</div>`
+        + `<div class="nstatus">${esc(n.status)}</div>`;
+      node.onclick = () => selectNode(n.id);
+      el.appendChild(node);
+    });
+    canvas.appendChild(el);
+  });
 }
 
-function pipelineHTML() {
-  const stages = PIPELINE.map(p =>
-    `<div class="pstage" data-kind="stage" data-val="${p.id}">
-       <div class="pl">${esc(p.label)}</div><div class="pd">${esc(p.desc)}</div>
-     </div>`).join('<span class="parrow">→</span>');
-  return `<div class="section-label">대표 개발 방향성 파이프라인 — 단계를 누르면 필요한 데이터셋이 강조됩니다</div>
-    <div class="pipeline">${stages}</div>`;
+function schemaTable(rows) {
+  return `<table class="schema"><thead><tr><th>필드</th><th>타입</th><th>예시</th></tr></thead><tbody>` +
+    rows.map(([f, t, ex]) => `<tr><td class="f">${esc(f)}</td><td class="t">${esc(t)}</td><td class="ex">${esc(ex)}</td></tr>`).join("") +
+    `</tbody></table>`;
 }
 
-function filtersHTML() {
-  const q = QUESTIONS.map(x => `<span class="chip" data-kind="question" data-val="${x.id}" title="${esc(x.desc)}">${esc(x.label)}</span>`).join("");
-  const src = Object.entries(SRC_TYPES).map(([k, v]) => `<span class="chip" data-kind="src" data-val="${k}" title="${esc(v.desc)}">${esc(v.label)}</span>`).join("");
-  return `<div class="filters">
-    <div class="filter-grp"><span class="glabel">판별 질문</span>${q}</div>
-    <div class="filter-grp"><span class="glabel">출처</span>${src}</div>
-    <span class="chip reset" id="reset">↺ 전체</span>
-  </div>`;
+function selectNode(id) {
+  canvas.querySelectorAll(".node.sel").forEach(n => n.classList.remove("sel"));
+  document.getElementById("n-" + id)?.classList.add("sel");
+  selectedId = id;
+  const n = byId[id];
+  const stages = n.stages.map(s => `<span class="chip">${esc(stageLabel(s))}</span>`).join("") || "—";
+  const qs = n.questions.length ? n.questions.map(q => `<span class="chip">${esc(q)}</span>`).join("") : "—";
+  const crawlTitle = n.srcType === "suspect" ? "획득 방법" : "출처 · 왜 크롤로 못 얻나";
+  side.innerHTML = `
+    <div class="s-head"><span class="s-name">${esc(n.name)}</span><span class="s-src">${esc(laneLabel(n.srcType))}</span></div>
+    <div class="s-mono">${esc(n.mono)}</div>
+    <div class="s-desc">${esc(n.what)}</div>
+
+    <div class="s-section">푸는 문제</div>
+    <div class="s-text">${esc(n.problem)}</div>
+
+    <div class="s-section">${esc(crawlTitle)}</div>
+    <div class="s-text${n.srcType === "suspect" ? "" : " crawl"}">${esc(n.source)}</div>
+
+    <div class="s-section">예시 스키마</div>
+    ${schemaTable(n.schema)}
+
+    <div class="s-section">쓰이는 단계</div>
+    <div>${stages}</div>
+
+    <div class="s-section">판별 질문</div>
+    <div>${qs}</div>
+
+    <div class="s-section">주인 · 상태</div>
+    <div class="s-meta"><b>주인:</b> ${esc(n.owner)}<br><b>상태:</b> ${esc(n.status)}${n.difficulty ? ` · 난이도 ${esc(n.difficulty)}` : ""}</div>`;
 }
 
-function cardHTML(d) {
-  const qs = d.questions.map(q => `<span class="badge b-q">${esc(q)}</span>`).join("");
-  const sts = d.stages.map(s => `<span class="badge b-stage">${esc(stageLabel(s))}</span>`).join("");
-  const srcMeta = SRC_TYPES[d.srcType] || { label: d.srcType };
-  return `<div class="card" data-id="${d.id}"
-      data-stages="${d.stages.join(",")}" data-questions="${d.questions.join(",")}" data-src="${d.srcType}">
-    <div class="chead">
-      <div><div class="cname">${esc(d.name)}</div><div class="cmono">${esc(d.mono)}</div></div>
-      <span class="badge b-status ${d.status}">${esc(d.status)}</span>
-    </div>
-    <div class="what">${esc(d.what)}</div>
-    <div class="src">
-      <div class="srclabel">출처 · 왜 크롤로 못 얻나</div>
-      <div class="srctext">${esc(d.source)}</div>
-    </div>
-    <div class="problem"><b>푸는 문제:</b> ${esc(d.problem)}</div>
-    <div class="meta">
-      <span class="badge b-src ${d.srcType}">${esc(srcMeta.label)}</span>
-      ${qs}${sts}
-    </div>
-    <div class="owner"><b>주인:</b> ${esc(d.owner)} · 난이도 ${esc(d.difficulty)}</div>
-  </div>`;
-}
-
-function gridHTML(title, note, items) {
-  return `<div class="section-label">${esc(title)}</div>
-    <div class="note">${note}</div>
-    <div class="grid">${items.map(cardHTML).join("")}</div>`;
-}
-
-function render() {
-  const root = document.getElementById("root");
-  root.innerHTML =
-    worldsHTML() +
-    pipelineHTML() +
-    filtersHTML() +
-    gridHTML("A. 기준 데이터 — 큐레이션해야 하는 정답지 (여기가 경쟁력)",
-      "모델은 공개되어 거의 공짜다. 진짜 만들어야 하는 것은 이 비교 기준 데이터이고, 절반은 <b>브랜드 협조 없이는 시작도 안 된다.</b>",
-      REF_DATASETS) +
-    gridHTML("B. 운영 데이터 — 직접 일하면 쌓이는 복리 자산",
-      "대시보드 안에서 사람이 일하며 생기는 1차 데이터. 정의상 외부가 가질 수 없다 — 대표가 말한 \"데이터 자산\"의 핵심.",
-      OP_DATASETS);
-
-  document.querySelectorAll("[data-kind]").forEach(el => {
-    el.onclick = () => {
-      const kind = el.dataset.kind, val = el.dataset.val;
-      filter = (filter && filter.kind === kind && filter.val === val) ? null : { kind, val };
-      applyFilter();
+function buildToolbar() {
+  const stages = PIPELINE.map(p => `<span class="tchip" data-kind="stage" data-val="${p.id}">${esc(p.label)}</span>`).join("");
+  const qs = QUESTIONS.map(q => `<span class="tchip" data-kind="question" data-val="${q.id}">${esc(q.label)}</span>`).join("");
+  toolbar.innerHTML =
+    `<span class="tlabel">단계</span>${stages}` +
+    `<span class="tlabel sep">질문</span>${qs}` +
+    `<span class="tchip clear" id="t-clear">↺ 해제</span>`;
+  toolbar.querySelectorAll(".tchip[data-kind]").forEach(c => {
+    c.onclick = () => {
+      const kind = c.dataset.kind, val = c.dataset.val;
+      focusOn = (focusOn && focusOn.kind === kind && focusOn.val === val) ? null : { kind, val };
+      applyFocus();
     };
   });
-  document.getElementById("reset").onclick = () => { filter = null; applyFilter(); };
-  applyFilter();
+  document.getElementById("t-clear").onclick = () => { focusOn = null; applyFocus(); };
 }
 
-function applyFilter() {
-  // 활성 표시
-  document.querySelectorAll("[data-kind]").forEach(el => {
-    const on = filter && filter.kind === el.dataset.kind && filter.val === el.dataset.val;
-    el.classList.toggle("active", !!on);
+function applyFocus() {
+  toolbar.querySelectorAll(".tchip[data-kind]").forEach(c => {
+    c.classList.toggle("active", !!(focusOn && focusOn.kind === c.dataset.kind && focusOn.val === c.dataset.val));
   });
-  // 카드 강조/흐림
-  document.querySelectorAll(".card").forEach(card => {
-    let hit = true;
-    if (filter) {
-      if (filter.kind === "stage") hit = card.dataset.stages.split(",").includes(filter.val);
-      else if (filter.kind === "question") hit = card.dataset.questions.split(",").includes(filter.val);
-      else if (filter.kind === "src") hit = card.dataset.src === filter.val;
-    }
-    card.classList.toggle("dim", filter && !hit);
-    card.classList.toggle("hit", !!(filter && hit));
+  canvas.querySelectorAll(".node.hl").forEach(n => n.classList.remove("hl"));
+  if (!focusOn) { canvas.classList.remove("focus"); return; }
+  canvas.classList.add("focus");
+  NODES.forEach(n => {
+    const arr = focusOn.kind === "stage" ? n.stages : n.questions;
+    if (arr.includes(focusOn.val)) document.getElementById("n-" + n.id)?.classList.add("hl");
   });
 }
 
-render();
+buildLanes();
+buildToolbar();
+selectNode("genuine_price");

@@ -16,11 +16,14 @@
       <a href="dashboard.html">대시보드 →</a>
     </div>
     <div class="title">TRUST<span>data</span> · 구축해야 할 데이터셋</div>
-    <div class="sub">위조 판별의 진짜 일은 모델이 아니라 비교 기준 데이터다. 그런데 그 기준은 마켓플레이스 크롤·구매로는 얻을 수 없다 — 브랜드·공개 등록부·자체 운영에서만 온다. 파이프라인 단계 · 판별 질문 · 출처를 눌러 어떤 데이터셋이 왜 필요한지 보세요.</div>
+    <div class="sub">위조 판별의 진짜 일은 모델이 아니라 비교 기준 데이터다. 맨 왼쪽 한 칸(판별 대상)만 크롤·구매로 얻고, 나머지는 브랜드·등록부·자체 운영에서만 온다. 노드를 클릭하면 스키마와 출처가, 위의 단계·질문을 누르면 그것을 떠받치는 데이터셋이 강조됩니다.</div>
   </header>
 
-  <div class="wrap">
-    <div id="root"></div>
+  <div class="toolbar" id="toolbar"></div>
+
+  <div class="body">
+    <div class="canvas" id="canvas"></div>
+    <aside class="side" id="side"></aside>
   </div>
 
   <script src="gate.js"></script>
